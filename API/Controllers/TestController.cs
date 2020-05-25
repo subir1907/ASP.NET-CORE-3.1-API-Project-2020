@@ -29,20 +29,20 @@ namespace API.Controllers
             return Ok("hello");
         }
 
-        [HttpGet]
+        [HttpGet( template: "create")]
         public async Task<IActionResult> DataInsert()
         {
             await _departmentStudentMongoRepository.Create(new DepartmentStudentReportMongo()
             {
                 DepartmentCode = "EEE",
                 DepartmentName = "Electrical and Electronic Engineering",
-                StudentName = "Subir Mandal",
-                StudentEmail = "subirew026@gmail.com",
-                StudentRoll = "2010-1-80-026",
+                StudentName = "AKM Touhidul Haque",
+                StudentEmail = "touhidul@gmail.com",
+                StudentRoll = "2010-1-80-033",
             });
             return Ok("Sucessfully insert");
         }
-        [HttpGet]
+        [HttpGet(template: "all")]
         public async Task<IActionResult> GetAll()
         {
 
