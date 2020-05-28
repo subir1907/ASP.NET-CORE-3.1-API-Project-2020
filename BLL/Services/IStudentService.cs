@@ -10,6 +10,8 @@ using BLL.Response;
 using DLL.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Utility.Exceptions;
+using DLL.MongoReport.Repositories;
+using DLL.MongoReport.Models;
 
 namespace BLL.Services
 {
@@ -34,10 +36,12 @@ public interface IStudentService
     public class StudentService : IStudentService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IDepartmentStudentMongoRepository _departmentStudentMongoRepository;
 
-        public StudentService(IUnitOfWork unitOfWork)
+        public StudentService(IUnitOfWork unitOfWork, IDepartmentStudentMongoRepository departmentStudentMongoRepository)
         {
             _unitOfWork = unitOfWork;
+            _departmentStudentMongoRepository = departmentStudentMongoRepository;
         }
 
         public async Task<Student> AddStudentAsync(StudentInsertRequest request)
@@ -51,7 +55,17 @@ public interface IStudentService
             }; 
            await _unitOfWork.StudentRepository.CreateAsync(student);
            if (await _unitOfWork.ApplicationSaveChangesAsync())
-           {
+            {
+                DepartmentStudentReportMongo deptStudentReportMongo = new DepartmentStudentReportMongo()
+                {
+                    DepartmentCode = student.Department.Code,
+                    DepartmentName = student.Department.Name,
+                    StudentName = student.Name,
+                    StudentEmail = student.Email,
+                    StudentRoll = student.RollNo,
+                };
+                await _departmentStudentMongoRepository.Create(deptStudentReportMongo);
+
                return student;
            }
            throw new MyAppException("Student Data Not save");
